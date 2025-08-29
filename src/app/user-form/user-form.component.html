@@ -1,0 +1,75 @@
+<div class="container mx-auto p-8">
+    <h1 class="text-4xl font-extrabold text-gray-900 text-center mb-8">
+        {{ isEditing() ? 'Editar Usuario' : 'Agregar Usuario' }}
+    </h1>
+
+    <div class="max-w-lg mx-auto">
+        <form (ngSubmit)="onSubmit()" class="space-y-6">
+            <div>
+                <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                <input
+                type="text"
+                name="nombre"
+                [ngModel]="nombre()"
+                (ngModelChange)="nombre.set($event)"
+                required
+                class="mt-1 block w-full px-5 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                placeholder="Nombre"
+                autocomplete="nombre"
+                >
+            </div>
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                type="text"
+                name="email"
+                [ngModel]="email()"
+                (ngModelChange)="email.set($event)"
+                required
+                class="mt-1 block w-full px-5 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                placeholder="Email"
+                autocomplete="email"
+                >
+            </div>
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+                <input
+                type="password"
+                name="password"
+                [ngModel]="password()"
+                (ngModelChange)="password.set($event)"
+                required
+                class="mt-1 block w-full px-5 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                placeholder="Password"
+                autocomplete="password"
+                >
+            </div>
+
+            <!-- Nuevo campo de selección de Perfil -->
+            <div>
+                <label for="profileId" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Permiso</label>
+                <select
+                name="profileId"
+                [ngModel]="profileId()"
+                (ngModelChange)="profileId.set($event)"
+                required
+                class="mt-1 block w-full px-5 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                >
+                <option value="" disabled selected>Selecciona un perfil</option>
+                @for (profile of profiles(); track profile._id) {
+                    <option 
+                        [value]="profile._id" 
+                        [selected]="profileId() === profile._id"
+                    >
+                        {{ profile.name }}
+                    </option>
+                }
+                </select>
+            </div>
+
+            <div class="flex justify-end">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>

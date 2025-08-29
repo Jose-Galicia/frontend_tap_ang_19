@@ -1,0 +1,28 @@
+<div class="container mx-auto p-8">
+  <div *ngIf="product(); else loading" class="bg-white p-8 rounded-xl shadow-lg max-w-lg mx-auto">
+    <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ product()!.nombre }}</h1>
+    <div class="space-y-4">
+      <p class="text-gray-600">
+        <span class="font-semibold text-gray-800">Marca:</span> {{ product()!.marca }}
+      </p>
+      <p class="text-gray-600">
+        <span class="font-semibold text-gray-800">Código:</span> {{ product()!.codigo }}
+      </p>
+      <p class="text-gray-600">
+        <span class="font-semibold text-gray-800">Precio:</span> ${{ product()!.precio | number }}
+      </p>
+      <p class="text-gray-600">
+        <span class="font-semibold text-gray-800">Fecha de Creación:</span> {{ product()!.created_at | date: 'longDate' }}
+      </p>
+      <p class="text-gray-600">
+        <span class="font-semibold text-gray-800">Última Actualización:</span> {{ product()!.updated_at | date: 'dd/MM/yy hh:mm:ss' }}
+      </p>
+    </div>
+    <button (click)="goBack()" class="mt-8 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200">
+      Volver a la lista
+    </button>
+  </div>
+  <ng-template #loading>
+    <div class="text-center text-gray-500">Cargando producto...</div>
+  </ng-template>
+</div>

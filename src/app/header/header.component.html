@@ -1,0 +1,23 @@
+<header class="bg-gray-800 text-white p-4 shadow-lg fixed top-0 w-full z-10">
+  <nav class="container mx-auto flex justify-between items-center">
+    <div class="text-2xl font-bold">
+      <!-- Cambia el enlace del título según si el usuario está logueado -->
+      <a *ngIf="isLoggedIn()" routerLink="/inicio">AdminPro</a>
+      <a *ngIf="!isLoggedIn()" routerLink="/login">AdminPro</a>
+    </div>
+    <div class="space-x-4">
+      <!-- Ocultar si no está logueado -->
+      <ng-container *ngIf="isLoggedIn()">
+        <a routerLink="/inicio" class="hover:text-gray-300 transition-colors duration-200">Inicio</a>
+        <a routerLink="/products" class="hover:text-gray-300 transition-colors duration-200">Productos</a>
+        <a routerLink="/users" *hasPermission="'admin'" class="hover:text-gray-300 transition-colors duration-200">Usuarios</a>
+        <a routerLink="/profiles" *hasPermission="'admin'" class="hover:text-gray-300 transition-colors duration-200">Perfiles</a>
+        <a (click)="onLogout()" class="hover:text-gray-300 transition-colors duration-200 cursor-pointer">Cerrar Sesión</a>
+      </ng-container>
+      <!-- Mostrar solo si no está logueado -->
+      <ng-container *ngIf="!isLoggedIn()">
+        <a routerLink="/login" class="hover:text-gray-300 transition-colors duration-200">Login</a>
+      </ng-container>
+    </div>
+  </nav>
+</header>

@@ -1,0 +1,6 @@
+/* src/app/login/login.component.css */
+.custom-bg {
+  background: linear-gradient(135deg, #023594 0%, #658ce0 100%);
+  /* Un degradado suave de azul claro a cian, ideal para un look profesional y limpio */
+  min-height: 100vh;
+}
