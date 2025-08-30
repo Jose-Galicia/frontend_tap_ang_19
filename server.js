@@ -2,8 +2,7 @@ const express = require("express");
 const path = require("path");
 
 const app = express();
-// Corrected path to match your build output
-const distPath = path.join(__dirname, "dist/frontend_tap_ang_19/browser");
+const distPath = path.join(__dirname, "dist/frontend-tap-ang-19/browser");
 
 app.use(express.static(distPath));
 
