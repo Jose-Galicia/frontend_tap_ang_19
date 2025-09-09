@@ -92,7 +92,7 @@ export class PerfilFormComponent implements OnInit {
         name: this.name(),
         permissions: arrayPermissions,
       };
-      debugger;
+      // debugger;
       this.profilesService.addProfile(newProfile).subscribe({
         next: () => {
           console.log('Perfil agregado con éxito');

@@ -17,6 +17,8 @@ export class UserViewComponent implements OnInit {
 
   // Señal para almacenar el usuario
   user = signal<User | null>(null);
+  profileImagePreview = signal<string | null>(null);
+  existingImageUrl = signal<string | null>(null);
 
   ngOnInit(): void {
     // Obtener el ID del usuario de la URL
@@ -24,7 +26,12 @@ export class UserViewComponent implements OnInit {
     if (id) {
       this.usersService.getUserById(id).subscribe({
         next: (user) => {
+          debugger;
           this.user.set(user);
+
+          if (user.profile_image) {
+            this.existingImageUrl.set(this.usersService.getProfileImageUrl(user.profile_image));
+          }
         },
         error: (error) => {
           console.error('Error al cargar el usuario:', error);

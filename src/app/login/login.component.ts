@@ -3,12 +3,13 @@
     import { Router } from '@angular/router';
     import { FormsModule } from '@angular/forms';
     import { AuthService } from '../services/auth.service';
-    import { Subscription } from 'rxjs'; // Importamos Subscription
+    import { Subscription } from 'rxjs';
+    import { RouterLink } from '@angular/router'; // Importamos Subscription
 
     @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, RouterLink],
     templateUrl: './login.component.html',
     styleUrl: './login.component.css',
     })

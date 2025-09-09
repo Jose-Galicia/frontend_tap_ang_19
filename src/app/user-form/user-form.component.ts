@@ -2,7 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { UsersService, User } from '../services/users.service';
+import { UsersService, User, ApiResponse } from '../services/users.service';
 import {ProfilesService, Profile } from '../services/profiles.service';
 
 @Component({
@@ -28,12 +28,18 @@ export class UserFormComponent implements OnInit {
   password = signal<string>('');
   profileId = signal<string | null>(null);
   profiles = signal<Profile[]>([]);
+  //Senales para las imagenes del usuario
+  profileImage = signal<File | null>(null);
+  profileImagePreview = signal<string | null>(null);
+  existingImageUrl = signal<string | null>(null);
+  isUploadingImage = signal<boolean>(false);
 
   // Señal para el ID del producto (null si es nuevo)
   userId = signal<string | null>(null);
   isEditing = signal<boolean>(false);
 
   // Edicion de producto
+  //ngOnInit Es llamado una vez que el componente ha sido inicializado
   ngOnInit(): void {
     // Cargar los perfiles disponibles desde la API
     this.profilesService.getProfiles().subscribe({
@@ -67,6 +73,7 @@ export class UserFormComponent implements OnInit {
     });
   }
 
+  //Esto es para debugear el select, ya no tiene uso
   debugAndSetProfileId(event: any): void {
     console.log('=== DEBUG SELECT ===');
     console.log('Event received:', event);
@@ -82,6 +89,38 @@ export class UserFormComponent implements OnInit {
     
     this.profileId.set(event);
     console.log('Current profileId signal after:', this.profileId());
+  }
+
+  onImageSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      // Validar tipo de archivo
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/svg+xml'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('Formato de archivo no válido. Use JPEG, PNG, JPG, GIF o SVG.');
+        return;
+      }
+
+      // Validar tamaño (2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        alert('La imagen no debe superar los 2MB.');
+        return;
+      }
+
+      this.profileImage.set(file);
+
+      // Crear preview
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.profileImagePreview.set(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  removeSelectedImage(): void {
+    this.profileImage.set(null);
+    this.profileImagePreview.set(null);
   }
 
   // Método para cargar los datos del usuario en modo de edición
@@ -100,6 +139,12 @@ export class UserFormComponent implements OnInit {
           if (user.profileId) {
             this.profileId.set(user.profileId);
           }
+
+          // Cargar imagen existente si existe, va a users.service.ts a el metodo getProfileImageUrl
+          if (user.profile_image) {
+            this.existingImageUrl.set(this.usersService.getProfileImageUrl(user.profile_image));
+          }
+
         },
         error: (error) => {
           console.error('Error al cargar el usuario:', error);
@@ -125,9 +170,19 @@ export class UserFormComponent implements OnInit {
 
       // Lógica para editar un usuario, va a users.service.ts
       this.usersService.updateUser(userToUpdate as User).subscribe({
-        next: () => {
+        next: (response: ApiResponse<User>) => {
           console.log('Usuario actualizado con éxito');
-          this.router.navigate(['/users']);
+
+          const userData = response.user;
+          const userIdToUse = userData.id || userData.id;
+
+          debugger;
+          // Si hay una imagen seleccionada, subirla después de actualizar el usuario
+          if (this.profileImage()) {
+            this.uploadProfileImage(userIdToUse);
+          } else {
+            this.router.navigate(['/users']);
+          }
         },
         error: (error) => {
           console.error('Error al actualizar el usuario:', error);
@@ -139,14 +194,44 @@ export class UserFormComponent implements OnInit {
       const newUser = { ...userPayload, id: '' };
       // Lógica para agregar un nuevo usuario, va a users.service.ts
       this.usersService.addUser(newUser as User).subscribe({
-        next: () => {
+        next: (response: ApiResponse<User>) => {
           console.log('Usuario agregado con éxito');
-          this.router.navigate(['/users']);
+
+          const userData = response.user!;
+          const userIdToUse = userData.id || userData.id;
+                    
+          // Si hay una imagen seleccionada, subirla después de crear el usuario
+          if (this.profileImage()) {
+            this.uploadProfileImage(userIdToUse);
+          } else {
+            this.router.navigate(['/users']);
+          }
         },
         error: (error) => {
           console.error('Error al agregar el usuario:', error);
         }
       });
     }
+  }
+
+  private uploadProfileImage(userId: string): void {
+    if (!this.profileImage()) return;
+
+    this.isUploadingImage.set(true);
+    debugger;
+    this.usersService.uploadProfileImage(userId, this.profileImage()!).subscribe({
+      next: () => {
+        alert('Imagen de perfil subida con éxito');
+        this.router.navigate(['/users']);
+      },
+      error: (error) => {
+        console.error('Error al subir la imagen:', error);
+        alert('Error al subir la imagen, pero el usuario fue guardado');
+        this.router.navigate(['/users']);
+      },
+      complete: () => {
+        this.isUploadingImage.set(false);
+      }
+    });
   }
 }
